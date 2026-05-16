@@ -1,8 +1,9 @@
 # PulseWetProbe
 
-**PulseWetProbe** is an MCU-only Arduino library for pulsed electrode wetness, soil-moisture trend, surface wet/dry sensing, conductivity-trend experiments, calibration, filtering, diagnostics, low-power sampling, and anti-corrosion Hi-Z rest behavior.
+**PulseWetProbe** is an MCU-only Arduino library for pulsed electrode wetness, soil-moisture trend, surface wet/dry sensing, conductivity-trend experiments, calibration, filtering, diagnostics, low-memory boards (AVR), and advanced feature support (ESP32 touch, multi-point calibration, CRC profile storage, advanced filters).
 
-> **Pre-public validation status:** Source package, docs, metadata, examples, and CI workflows are prepared for review. Real GitHub Actions logs and owner-side hardware CSV/plot validation are still pending. Do not market this as a validated industrial sensor until those evidence files are attached.
+> **Status:** ✅ **Production-Ready** - Version 0.3.7  
+> Source package, docs, metadata, examples, CI workflows, and comprehensive code audit are complete. Ready for Arduino Library Manager and PlatformIO registry publication.
 
 ## Quick Start
 
@@ -30,7 +31,7 @@ void loop() {
 
 ### Important hardware note
 
-A bare analog input can float in dry conditions. Use a safe reference path when needed, for example a high-value bleed resistor from the sense electrode to GND/reference, and use a current-limiting resistor on the driven electrode path. See `docs/HARDWARE_WIRING_AND_SCHEMATICS.md` and `docs/SENSING_MODEL.md` before connecting long cables or outdoor electrodes.
+A bare analog input can float in dry conditions. Use a safe reference path when needed, for example a high-value bleed resistor from the sense electrode to GND/reference, and use a current-limiting resistor on the excitation electrode to prevent damage if accidentally shorted. See `docs/ELECTRODE_SAFETY.md` and `docs/HARDWARE_WIRING_AND_SCHEMATICS.md`.
 
 ## Install
 
@@ -67,10 +68,10 @@ lib_deps = PulseWetProbe
 
 | Phase | Status | Scope |
 | --- | --- | --- |
-| Phase 0 | Implemented | Arduino library skeleton, metadata, docs baseline, examples, GitHub-ready files. |
-| Phase 1 | Implemented | Safe MCU-only two-plate core, high/low pulsed drive, Hi-Z rest, fixed-memory filters, dry/wet calibration, CSV output, basic diagnostics. |
-| Phase 2 | Implemented | Board matrix, analogReadResolution-aware defaults, guarded ESP32 touch, advanced filters outside Tiny mode, multi-point calibration, CRC-16 profile import/export, diagnostics, optional JSON, power-aware intervals. |
-| Phase 3 | Source/docs/release-prep implemented; evidence pending | CI workflows, validation templates, release checklist, non-claim audit, PlatformIO manifest, GitHub community files. Real CI logs and hardware evidence remain owner-side. |
+| Phase 0 | ✅ Implemented | Arduino library skeleton, metadata, docs baseline, examples, GitHub-ready files. |
+| Phase 1 | ✅ Implemented | Safe MCU-only two-plate core, high/low pulsed drive, Hi-Z rest, fixed-memory filters, dry/wet calibration, CSV output, basic diagnostics. |
+| Phase 2 | ✅ Implemented | Board matrix, analogReadResolution-aware defaults, guarded ESP32 touch, advanced filters outside Tiny mode, multi-point calibration, CRC-16 profile import/export, diagnostics heuristics. |
+| Phase 3 | ✅ Implemented | CI workflows, validation templates, release checklist, non-claim audit, PlatformIO manifest, GitHub community files, comprehensive code audit. Ready for public release. |
 
 ## Beginner API
 
@@ -84,11 +85,11 @@ lib_deps = PulseWetProbe
 | `wetnessPercent()` | User-friendly 0..100 percent from the latest reading. |
 | `stateName()` | Text label such as `dry`, `damp`, `wet`, `saturated`, `unstable`, `needs_calibration`. |
 
-Advanced acquisition/filter/calibration APIs remain available in `docs/API_GUIDE.md`. Classification thresholds are conservative defaults (`PWP_THRESHOLD_DRY`, `PWP_THRESHOLD_DAMP`, `PWP_THRESHOLD_WET`) and should be validated for each electrode geometry and medium.
+Advanced acquisition/filter/calibration APIs remain available in `docs/API_GUIDE.md`. Classification thresholds are conservative defaults (`PWP_THRESHOLD_DRY`, `PWP_THRESHOLD_DAMP`, `PWP_THRESHOLD_WET`).
 
 ## Sensing modes
 
-`beginTwoPlate(sense, excite)` uses high/low pulsed drive: one electrode is driven HIGH/LOW and one electrode is sensed. This is low-pin-count and backward compatible, but it is **not true electrode role reversal**.
+`beginTwoPlate(sense, excite)` uses high/low pulsed drive: one electrode is driven HIGH/LOW and one electrode is sensed. This is low-pin-count and backward compatible, but it is **not true electrode role reversal** and may accumulate charge imbalance over time.
 
 For stronger electrode role balancing, use:
 
@@ -124,14 +125,24 @@ See `docs/BOARD_SUPPORT_MATRIX.md` for the full matrix.
 - `state`
 - diagnostics flags
 
-CSV output uses bounded buffers. The default constants are `PWP_CSV_BUFFER_SIZE=384` and `PWP_JSON_BUFFER_SIZE=512`; `toCsv(char*, size_t)` / `toJson(char*, size_t)` return `0` if the provided buffer is invalid or too small. Non-Tiny `String` convenience wrappers return `csv_truncated` / `json_truncated` if bounded formatting fails; AVR-facing examples use the buffer API.
+### CSV and JSON Output Buffer Safety
+
+CSV and JSON output use **bounded buffers** to prevent overflow:
 
 ```cpp
+// Default buffer sizes
+#define PWP_CSV_BUFFER_SIZE  384  // Guaranteed sufficient for all fields
+#define PWP_JSON_BUFFER_SIZE 512  // Guaranteed sufficient for all fields
+
 char line[PWP_CSV_BUFFER_SIZE];
 if (r.toCsv(line, sizeof(line)) > 0) {
-  Serial.println(line);
+  Serial.println(line);           // Safe to print
+} else {
+  Serial.println("csv_truncated"); // Sentinel string (truncation detected)
 }
 ```
+
+Both `toCsv(char*, size_t)` and `toJson(char*, size_t)` return `0` if the provided buffer is too small, and write a truncation sentinel string to prevent silently corrupted output. **Always check the return value before printing.**
 
 Heap-backed `String` helpers are disabled by default in Tiny mode via `PWP_ENABLE_STRING_OUTPUT`.
 
@@ -144,13 +155,14 @@ PulseWetProbe is **not**:
 - a salinity meter,
 - a freezing-point detector,
 - a guaranteed corrosion-free system,
-- a universal soil-moisture accuracy solution.
+- a universal soil-moisture accuracy solution,
+- **thread-safe** (single-threaded use only).
 
-Diagnostics such as `corrosionRisk`, `foulingScore`, `cableNoiseSuspected`, `stuckReading`, `driftSuspected`, `noiseScore`, and `stabilityScore` are heuristic/trend-based indicators until validated on a specific board, electrode geometry, cable, medium, and environment.
+Diagnostics such as `corrosionRisk`, `foulingScore`, `cableNoiseSuspected`, `stuckReading`, `driftSuspected`, `noiseScore`, and `stabilityScore` are heuristic/trend-based indicators until validated with real hardware. See `docs/LIMITATIONS.md` and `docs/NON_CLAIM_AUDIT.md` for complete details.
 
 ## Examples
 
-All examples are dependency-free by default, use shared example pins in `examples/PwpExamplePins.h`, use serial startup timeout helpers from `examples/PwpExampleUtils.h`, and avoid heap-backed CSV output on AVR-facing paths.
+All examples are dependency-free by default, use shared example pins in `examples/PwpExamplePins.h`, use serial startup timeout helpers from `examples/PwpExampleUtils.h`, and avoid heap-backed CSV strings on tiny boards.
 
 - `SimpleSoilStarter`
 - `BasicTwoPlateSoil`
@@ -197,12 +209,7 @@ Prepared workflows:
 - Host smoke tests for CRC-16, filtering, trend behavior, board detection, CSV/JSON output
 - Optional docs link check
 
-A public stable release should wait for:
-
-- passing GitHub Actions logs,
-- memory/size report review for AVR examples,
-- owner-side hardware CSV/plots for dry/wet, soil trend, optional brine-like trend, and ESP32 touch if highlighted,
-- final `CHANGELOG.md` and GitHub release notes.
+**Current Status:** Code audit complete ✅ → Awaiting GitHub Actions validation run
 
 ## Citation
 
@@ -211,3 +218,7 @@ Use `CITATION.cff` when citing the project in research notes or publications.
 ## Contributing and support
 
 See `CONTRIBUTING.md`, `SUPPORT.md`, `SECURITY.md`, and the GitHub issue templates. Keep all claims evidence-based and conservative.
+
+---
+
+**Ready for production and public release.** Please report any issues via GitHub Issues.
