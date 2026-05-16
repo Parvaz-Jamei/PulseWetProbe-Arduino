@@ -1,0 +1,57 @@
+{
+  "name": "PulseWetProbe",
+  "version": "0.3.7",
+  "description": "MCU-only Arduino library for pulsed electrode wetness, soil moisture, surface state, and conductivity-trend sensing with board-aware defaults, calibration, filtering, diagnostics, low-power sampling, and conservative anti-corrosion behavior.",
+  "keywords": [
+    "arduino",
+    "arduino-library",
+    "esp32",
+    "avr",
+    "samd",
+    "renesas",
+    "rp2040",
+    "stm32",
+    "teensy",
+    "soil-moisture",
+    "wetness",
+    "wet-dry",
+    "electrode-sensor",
+    "conductivity-trend",
+    "capacitive-sensor",
+    "surface-sensing",
+    "brine",
+    "ice-risk",
+    "low-power",
+    "industrial-iot",
+    "sensor-calibration",
+    "signal-filtering"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Parvaz-Jamei/PulseWetProbe-Arduino.git"
+  },
+  "authors": [
+    {
+      "name": "Parvaz Jamei",
+      "email": "parvaz.nic@gmail.com",
+      "url": "https://github.com/Parvaz-Jamei",
+      "maintainer": true
+    }
+  ],
+  "license": "MIT",
+  "frameworks": "arduino",
+  "platforms": "*",
+  "headers": "PulseWetProbe.h",
+  "export": {
+    "exclude": [
+      ".github",
+      "test",
+      "validation/raw",
+      "ci-logs",
+      "sketches-reports",
+      ".pio",
+      ".arduino",
+      "build"
+    ]
+  }
+}

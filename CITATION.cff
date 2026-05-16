@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use PulseWetProbe in a project or publication, please cite it using these metadata."
+title: "PulseWetProbe"
+abstract: "Arduino library for MCU-only pulsed electrode wetness, soil-moisture trend, conductivity-trend, filtering, calibration, diagnostics, board-aware defaults, and reversible two-plate role balancing and anti-corrosion Hi-Z rest behavior."
+version: 0.3.6
+date-released: 2026-05-16
+authors:
+  - family-names: "Jamei"
+    given-names: "Parvaz"
+repository-code: "https://github.com/Parvaz-Jamei/PulseWetProbe-Arduino"
+license: MIT
+keywords:
+  - Arduino
+  - wetness sensing
+  - soil moisture
+  - electrode sensing
+  - Industrial IoT

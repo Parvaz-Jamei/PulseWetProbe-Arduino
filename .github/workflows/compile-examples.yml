@@ -1,0 +1,59 @@
+name: Compile Arduino examples
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  compile-examples:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - fqbn: arduino:avr:uno
+            board_id: arduino_avr_uno
+            platforms: |
+              - name: arduino:avr
+          - fqbn: arduino:avr:nano
+            board_id: arduino_avr_nano
+            platforms: |
+              - name: arduino:avr
+          - fqbn: esp32:esp32:esp32
+            board_id: esp32_esp32_dev
+            platforms: |
+              - source-url: https://espressif.github.io/arduino-esp32/package_esp32_index.json
+                name: esp32:esp32
+          - fqbn: esp8266:esp8266:nodemcuv2
+            board_id: esp8266_nodemcuv2
+            platforms: |
+              - source-url: https://arduino.esp8266.com/stable/package_esp8266com_index.json
+                name: esp8266:esp8266
+          - fqbn: arduino:samd:nano_33_iot
+            board_id: arduino_samd_nano_33_iot
+            platforms: |
+              - name: arduino:samd
+          - fqbn: arduino:renesas_uno:unor4wifi
+            board_id: arduino_renesas_uno_r4_wifi
+            platforms: |
+              - name: arduino:renesas_uno
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/compile-sketches@v1
+        with:
+          fqbn: ${{ matrix.fqbn }}
+          platforms: ${{ matrix.platforms }}
+          libraries: |
+            - source-path: ./
+          sketch-paths: |
+            - examples
+          cli-compile-flags: |
+            - --warnings
+            - all
+          enable-warnings-report: true
+          sketches-report-path: sketches-reports/${{ matrix.board_id }}
+      - name: Upload compile report
+        uses: actions/upload-artifact@v4
+        with:
+          name: compile-report-${{ matrix.board_id }}
+          path: sketches-reports/${{ matrix.board_id }}

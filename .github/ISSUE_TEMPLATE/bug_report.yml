@@ -1,0 +1,36 @@
+name: Bug report
+description: Report a reproducible PulseWetProbe source or runtime issue.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: PulseWetProbe version
+      placeholder: "0.3.5"
+    validations:
+      required: true
+  - type: input
+    id: board
+    attributes:
+      label: Board and Arduino core version
+      placeholder: "Arduino UNO R3, Arduino AVR Boards 1.8.x"
+    validations:
+      required: true
+  - type: textarea
+    id: sketch
+    attributes:
+      label: Minimal sketch or example name
+      render: cpp
+  - type: textarea
+    id: logs
+    attributes:
+      label: Compile/runtime logs
+      render: text

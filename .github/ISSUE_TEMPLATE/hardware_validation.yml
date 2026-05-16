@@ -1,0 +1,27 @@
+name: Hardware validation evidence
+description: Share owner-side CSV/plots/board evidence for validation.
+title: "[Validation]: "
+labels: [validation, hardware]
+body:
+  - type: input
+    id: board
+    attributes:
+      label: Board and core version
+    validations:
+      required: true
+  - type: textarea
+    id: topology
+    attributes:
+      label: Electrode topology and wiring
+      description: Include series resistor, bleed/reference resistor, cable length, and medium.
+    validations:
+      required: true
+  - type: textarea
+    id: csv
+    attributes:
+      label: CSV excerpt or link to data
+      render: text
+  - type: textarea
+    id: result
+    attributes:
+      label: What was observed?

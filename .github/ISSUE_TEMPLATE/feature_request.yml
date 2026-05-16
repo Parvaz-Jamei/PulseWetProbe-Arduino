@@ -1,0 +1,22 @@
+name: Feature request
+description: Suggest a controlled, non-overclaiming feature.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Use case
+      description: What problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints
+      description: Board/RAM/dependency/validation constraints.
+  - type: textarea
+    id: nonclaims
+    attributes:
+      label: Claim-control notes
+      description: Any risk of overclaiming EC/salinity/freezing/RWIS/corrosion behavior?

@@ -1,0 +1,28 @@
+name: Host smoke tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  host-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile and run host smoke test
+        run: |
+          g++ -std=c++11 -Wall -Wextra -Werror -pedantic -I src src/PulseWetProbe.cpp test/host/host_smoke.cpp -o /tmp/pwp_host_smoke
+          /tmp/pwp_host_smoke
+      - name: Compile and run board detection smoke tests
+        run: |
+          set -e
+          g++ -std=c++11 -Wall -Wextra -Werror -pedantic -I src -DARDUINO_ARCH_AVR -D__AVR__ src/PulseWetProbe.cpp test/host/board_detection_smoke.cpp -o /tmp/pwp_detect_avr
+          /tmp/pwp_detect_avr avr
+          g++ -std=c++11 -Wall -Wextra -Werror -pedantic -I src -DARDUINO_ARCH_MEGAAVR -D__AVR__ src/PulseWetProbe.cpp test/host/board_detection_smoke.cpp -o /tmp/pwp_detect_megaavr
+          /tmp/pwp_detect_megaavr megaavr
+          g++ -std=c++11 -Wall -Wextra -Werror -pedantic -I src -DARDUINO_ARCH_RENESAS_UNO src/PulseWetProbe.cpp test/host/board_detection_smoke.cpp -o /tmp/pwp_detect_renesas_uno
+          /tmp/pwp_detect_renesas_uno renesas
+          g++ -std=c++11 -Wall -Wextra -Werror -pedantic -I src -DARDUINO_ARCH_RENESAS src/PulseWetProbe.cpp test/host/board_detection_smoke.cpp -o /tmp/pwp_detect_renesas
+          /tmp/pwp_detect_renesas renesas
+          g++ -std=c++11 -Wall -Wextra -Werror -pedantic -I src -DARDUINO_ARCH_ESP8266 src/PulseWetProbe.cpp test/host/board_detection_smoke.cpp -o /tmp/pwp_detect_esp8266
+          /tmp/pwp_detect_esp8266 esp8266

@@ -1,0 +1,30 @@
+name: Board support request
+description: Ask for board-family support or report a board matrix mismatch.
+title: "[Board]: "
+labels: [board-support]
+body:
+  - type: input
+    id: board
+    attributes:
+      label: Board model
+      placeholder: "Nano Every, UNO R4 WiFi, ESP32-S3 DevKit..."
+    validations:
+      required: true
+  - type: input
+    id: fqbn
+    attributes:
+      label: FQBN if known
+      placeholder: "arduino:renesas_uno:unor4wifi"
+  - type: input
+    id: core
+    attributes:
+      label: Arduino core/package version
+  - type: textarea
+    id: capability
+    attributes:
+      label: Expected capability/default mode
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Compile output or BoardCapabilityReporter output
+      render: text
