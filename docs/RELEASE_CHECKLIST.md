@@ -26,7 +26,7 @@
 - [ ] `library.properties` exists in repository root.
 - [ ] `src/PulseWetProbe.h` is the public header.
 - [ ] `library.properties`, `library.json`, `CITATION.cff`, README, CHANGELOG, and release notes versions match.
-- [ ] Git tag matches `library.properties` version, for example `v0.3.5`.
+- [ ] Git tag matches `library.properties` version, for example `v0.3.7`.
 
 ## CI
 

@@ -1,6 +1,6 @@
 # Validation Evidence Status
 
-Version: 0.3.5 pre-public release hardening
+Version: 0.3.7 bug-fix release
 Date: 2026-05-16
 
 ## Source-level checks completed in package generation

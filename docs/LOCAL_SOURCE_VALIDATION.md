@@ -1,6 +1,6 @@
 # Local Source Validation
 
-Version: 0.3.5 pre-public final polish
+Version: 0.3.7 bug-fix release
 Date: 2026-05-16
 
 ## Commands run during package preparation

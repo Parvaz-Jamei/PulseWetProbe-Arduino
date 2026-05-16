@@ -1,4 +1,4 @@
-# Release Notes Draft - PulseWetProbe 0.3.5 Pre-public Release Hardening
+# Release Notes Draft - PulseWetProbe 0.3.7 Bug Fix
 
 ## What changed
 
@@ -14,6 +14,10 @@
 - Added named conductivity/classification constants and `setConductivityTrendWeights()`.
 
 ## Fixes
+
+- Fixed `applyMovingAverage()` circular-buffer indexing so the moving average always uses the most recent samples.
+- Fixed `computeConductivityTrend()` weight-selection priority so conductivity/brine profiles are not overwritten by reversible-mode defaults.
+- Added host-smoke regression tests for the moving-average and conductivity-trend fixes.
 
 - Hampel filtering now uses a dedicated sample window instead of stale moving-average state.
 - `applyFilters()` uses the `noise` parameter for adaptive outlier/EMA behavior.

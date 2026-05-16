@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use PulseWetProbe in a project or publication, please cite it using these metadata."
 title: "PulseWetProbe"
 abstract: "Arduino library for MCU-only pulsed electrode wetness, soil-moisture trend, conductivity-trend, filtering, calibration, diagnostics, board-aware defaults, and reversible two-plate role balancing and anti-corrosion Hi-Z rest behavior."
-version: 0.3.6
+version: "0.3.7"
 date-released: 2026-05-16
 authors:
   - family-names: "Jamei"
